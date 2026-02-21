@@ -60,6 +60,8 @@ class DatadogIntegration:
                 "security_mode": metadata.get("security_mode"),
                 "authorized": metadata.get("authorized"),
                 "blocked": metadata.get("blocked"),
+                "doctor_id": metadata.get("doctor_id"),
+                "patient_id": metadata.get("patient_id"),
                 "timestamp": datetime.utcnow().isoformat()
             }
             
@@ -240,7 +242,7 @@ class DatadogIntegration:
                 },
                 {
                     "definition": {
-                        "title": "Total Cost (Last Hour)",
+                        "title": "Total Cost (Estimate, Last Hour)",
                         "title_size": "16",
                         "title_align": "left",
                         "type": "query_value",
@@ -256,11 +258,14 @@ class DatadogIntegration:
                                     "metric": "@cost_usd"
                                 },
                                 "group_by": []
+                            }],
+                            "formulas": [{
+                                "formula": "query1"
                             }]
                         }],
-                        "autoscale": True,
+                        "autoscale": False,
                         "precision": 4,
-                        "custom_unit": "$"
+                        "custom_unit": "USD"
                     },
                     "layout": {"x": 9, "y": 0, "width": 3, "height": 2}
                 },
@@ -442,13 +447,94 @@ class DatadogIntegration:
                         "title_align": "left",
                         "type": "log_stream",
                         "query": "source:aegisgraph",
-                        "columns": ["@timestamp", "@request_id", "@prompt", "@response", "@cost_usd", "@blocked", "@authorized"],
+                        "columns": ["@timestamp", "@doctor_id", "@patient_id", "@prompt", "@response", "@cost_usd", "@blocked", "@authorized"],
                         "message_display": "expanded-md",
                         "show_date_column": True,
                         "show_message_column": True,
                         "sort": {"column": "time", "order": "desc"}
                     },
                     "layout": {"x": 0, "y": 8, "width": 12, "height": 4}
+                },
+                
+                # Row 5: Top 5 Attacked Patients
+                {
+                    "definition": {
+                        "title": "Top 5 Attacked Patients",
+                        "title_size": "16",
+                        "title_align": "left",
+                        "type": "toplist",
+                        "requests": [{
+                            "response_format": "scalar",
+                            "queries": [{
+                                "data_source": "logs",
+                                "name": "attacks",
+                                "search": {"query": "source:aegisgraph @blocked:true"},
+                                "indexes": ["*"],
+                                "compute": {"aggregation": "count"},
+                                "group_by": [{
+                                    "facet": "@patient_id",
+                                    "limit": 5,
+                                    "sort": {"aggregation": "count", "order": "desc"}
+                                }]
+                            }]
+                        }]
+                    },
+                    "layout": {"x": 0, "y": 12, "width": 6, "height": 3}
+                },
+                
+                # Row 5: PHI Redactions Metric
+                {
+                    "definition": {
+                        "title": "PHI Redactions (Last Hour)",
+                        "title_size": "16",
+                        "title_align": "left",
+                        "type": "query_value",
+                        "requests": [{
+                            "response_format": "scalar",
+                            "queries": [{
+                                "data_source": "logs",
+                                "name": "redactions",
+                                "search": {"query": "source:aegisgraph"},
+                                "indexes": ["*"],
+                                "compute": {
+                                    "aggregation": "sum",
+                                    "metric": "@redaction_count"
+                                },
+                                "group_by": []
+                            }],
+                            "formulas": [{"formula": "redactions"}]
+                        }],
+                        "autoscale": True,
+                        "precision": 0,
+                        "custom_unit": "redactions"
+                    },
+                    "layout": {"x": 6, "y": 12, "width": 3, "height": 3}
+                },
+                
+                # Row 5: Attack Type Distribution
+                {
+                    "definition": {
+                        "title": "Attack Type Distribution",
+                        "title_size": "16",
+                        "title_align": "left",
+                        "type": "sunburst",
+                        "requests": [{
+                            "response_format": "scalar",
+                            "queries": [{
+                                "data_source": "logs",
+                                "name": "types",
+                                "search": {"query": "source:aegisgraph @blocked:true"},
+                                "indexes": ["*"],
+                                "compute": {"aggregation": "count"},
+                                "group_by": [{
+                                    "facet": "@reason",
+                                    "limit": 10,
+                                    "sort": {"aggregation": "count", "order": "desc"}
+                                }]
+                            }]
+                        }]
+                    },
+                    "layout": {"x": 9, "y": 12, "width": 3, "height": 3}
                 }
             ],
             "template_variables": [],

@@ -14,6 +14,7 @@ class ChatRequest(BaseModel):
     patient_id: str
     message: str
     security_mode: str = "NORMAL"
+    emergency_mode: bool = False
 
     @model_validator(mode="after")
     def assign_request_id(self) -> "ChatRequest":

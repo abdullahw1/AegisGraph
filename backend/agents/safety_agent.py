@@ -12,8 +12,11 @@ from backend.tools.mock_bedrock_client import MockBedrockClient
 class SafetyAgent:
     """Agent that scans messages for security threats."""
     
-    # Keywords that trigger auto-block in STRICT_MODE
-    STRICT_MODE_KEYWORDS = ["ssn", "dob", "home address", "print database"]
+    # Keywords that ALWAYS trigger auto-block (regardless of mode)
+    ALWAYS_BLOCK_KEYWORDS = ["ssn", "social security", "credit card", "password", "pin code"]
+    
+    # Additional keywords that trigger auto-block in STRICT_MODE
+    STRICT_MODE_KEYWORDS = ["dob", "date of birth", "home address", "print database", "export data"]
     
     def __init__(self):
         use_mock = os.getenv("USE_MOCK_BEDROCK", "false").lower() == "true"
@@ -39,7 +42,18 @@ class SafetyAgent:
             span.set_tag("patient_id", request.patient_id)
             
             try:
-                # STRICT_MODE keyword check (pre-Bedrock)
+                # ALWAYS check for sensitive PII keywords (regardless of mode)
+                blocked, attack_types = self._check_always_block_keywords(request.message)
+                if blocked:
+                    return SafetyDecision(
+                        action="BLOCK",
+                        risk_score=100,
+                        phi_exposure_risk=1.0,
+                        attack_types=attack_types,
+                        reason="Sensitive PII request blocked"
+                    )
+                
+                # STRICT_MODE keyword check
                 if request.security_mode == "STRICT_MODE":
                     blocked, attack_types = self._check_strict_mode_keywords(request.message)
                     if blocked:
@@ -97,6 +111,25 @@ class SafetyAgent:
                     attack_types=["bedrock_error"],
                     reason=f"Safety scan failed, blocking as fail-safe: {str(e)}"
                 )
+    
+    def _check_always_block_keywords(self, message: str) -> tuple[bool, List[str]]:
+        """
+        Check if message contains keywords that should ALWAYS be blocked.
+        
+        Returns:
+            (blocked, attack_types) tuple
+        """
+        message_lower = message.lower()
+        found_keywords = []
+        
+        for keyword in self.ALWAYS_BLOCK_KEYWORDS:
+            if keyword in message_lower:
+                found_keywords.append(f"sensitive_pii_{keyword.replace(' ', '_')}")
+        
+        if found_keywords:
+            return True, found_keywords
+        
+        return False, []
     
     def _check_strict_mode_keywords(self, message: str) -> tuple[bool, List[str]]:
         """

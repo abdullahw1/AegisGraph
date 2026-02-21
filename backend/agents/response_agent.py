@@ -7,6 +7,7 @@ from ddtrace import tracer
 from backend.models.schemas import ChatRequest, PolicyDecision, SafetyDecision, ResponseDecision
 from backend.tools.bedrock_client import BedrockClient
 from backend.tools.mock_bedrock_client import MockBedrockClient
+from backend.tools.phi_redactor import PHIRedactor
 
 
 class ResponseAgent:
@@ -23,6 +24,8 @@ class ResponseAgent:
         # Import here to avoid circular dependency
         from backend.tools.neo4j_client import Neo4jClient
         self.neo4j_client = Neo4jClient()
+        # Initialize PHI redactor
+        self.phi_redactor = PHIRedactor()
     
     async def generate(
         self,
@@ -66,6 +69,9 @@ class ResponseAgent:
                 # Invoke Bedrock
                 response = self.bedrock_client.invoke(self.model_id, prompt)
                 
+                # REDACT PHI from response before returning
+                redacted_response, redaction_count = self.phi_redactor.redact(response, patient_context)
+                
                 # Parse response and extract metadata
                 # Note: Titan doesn't return structured metadata, so we estimate
                 tokens_in = self._estimate_tokens(prompt)
@@ -73,9 +79,9 @@ class ResponseAgent:
                 cost_usd = self._calculate_cost(tokens_in, tokens_out)
                 
                 return ResponseDecision(
-                    final_text=response,
+                    final_text=redacted_response,
                     blocked=False,
-                    redaction_count=0,
+                    redaction_count=redaction_count,
                     reason_codes=[],
                     tokens_in=tokens_in,
                     tokens_out=tokens_out,

@@ -122,6 +122,15 @@ async def run_pipeline(request: ChatRequest) -> Dict[str, Any]:
     policy_decision: PolicyDecision = await graph_policy_agent.check(request, intent_decision)
     logger.info(f"Authorization: {policy_decision.authorized}, scope: {policy_decision.scope}")
     
+    # --- EMERGENCY MODE OVERRIDE ---
+    if request.emergency_mode and not policy_decision.authorized:
+        logger.warning(f"EMERGENCY MODE: Overriding authorization denial for request {request.request_id}")
+        policy_decision.authorized = True
+        policy_decision.scope = "FULL"
+        policy_decision.break_glass = True
+        policy_decision.reason_code = "emergency_override"
+        policy_decision.audit_trail.append("EMERGENCY_MODE_OVERRIDE")
+    
     # --- GATE 4: Deny Gate ---
     if not policy_decision.authorized and not policy_decision.break_glass:
         logger.info(f"Request {request.request_id} denied: {policy_decision.reason_code}")
@@ -141,12 +150,14 @@ async def run_pipeline(request: ChatRequest) -> Dict[str, Any]:
         datadog_integration.log_prompt(
             request_id=request.request_id,
             prompt=request.message,
-            response="",
+            response="This request is blocked and has been reported to admin",
             metadata={
                 "security_mode": request.security_mode,
                 "authorized": False,
                 "blocked": True,
-                "reason": policy_decision.reason_code
+                "reason": policy_decision.reason_code,
+                "doctor_id": request.doc_id,
+                "patient_id": request.patient_id
             }
         )
         
@@ -157,7 +168,7 @@ async def run_pipeline(request: ChatRequest) -> Dict[str, Any]:
             "request_id": request.request_id,
             "blocked": True,
             "reason": f"Authorization denied: {policy_decision.reason_code}",
-            "final_text": "",
+            "final_text": "This request is blocked and has been reported to admin",
             "security_mode": request.security_mode,
             "policy_decision": {
                 "authorized": policy_decision.authorized,
@@ -204,14 +215,16 @@ async def run_pipeline(request: ChatRequest) -> Dict[str, Any]:
         datadog_integration.log_prompt(
             request_id=request.request_id,
             prompt=request.message,
-            response="",
+            response="This request is blocked and has been reported to admin",
             metadata={
                 "security_mode": request.security_mode,
                 "authorized": policy_decision.authorized,
                 "blocked": True,
                 "reason": safety_decision.reason,
                 "risk_score": safety_decision.risk_score,
-                "attack_types": safety_decision.attack_types
+                "attack_types": safety_decision.attack_types,
+                "doctor_id": request.doc_id,
+                "patient_id": request.patient_id
             }
         )
         
@@ -222,7 +235,7 @@ async def run_pipeline(request: ChatRequest) -> Dict[str, Any]:
             "request_id": request.request_id,
             "blocked": True,
             "reason": f"Safety block: {safety_decision.reason}",
-            "final_text": "",
+            "final_text": "This request is blocked and has been reported to admin",
             "security_mode": request.security_mode,
             "safety_decision": {
                 "action": safety_decision.action,
@@ -295,7 +308,8 @@ async def run_pipeline(request: ChatRequest) -> Dict[str, Any]:
         "intent": intent_decision.intent,
         "authorized": policy_decision.authorized,
         "scope": policy_decision.scope,
-        "break_glass": policy_decision.break_glass
+        "break_glass": policy_decision.break_glass,
+        "redaction_count": response_decision.redaction_count
     }
     
     # --- STEP 9: Log to Datadog ---
@@ -312,7 +326,10 @@ async def run_pipeline(request: ChatRequest) -> Dict[str, Any]:
             "authorized": policy_decision.authorized,
             "blocked": False,
             "intent": intent_decision.intent,
-            "scope": policy_decision.scope
+            "scope": policy_decision.scope,
+            "doctor_id": request.doc_id,
+            "patient_id": request.patient_id,
+            "redaction_count": response_decision.redaction_count
         }
     )
     

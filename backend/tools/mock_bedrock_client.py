@@ -75,10 +75,12 @@ class MockBedrockClient:
         # Clinical response generation
         else:
             # Extract the actual question from the prompt
-            question = ""
-            if "question:" in prompt_lower:
+            question = prompt  # Default to full prompt
+            if "Question:" in prompt:
                 q_start = prompt.find("Question:") + 9
                 q_end = prompt.find("\n", q_start)
+                if q_end == -1:
+                    q_end = prompt.find("Response:", q_start)
                 if q_end == -1:
                     q_end = len(prompt)
                 question = prompt[q_start:q_end].strip()
@@ -87,7 +89,7 @@ class MockBedrockClient:
             question_lower = question.lower()
             
             # Greetings
-            if any(word in question_lower for word in ["hi", "hello", "hey"]):
+            if any(word in question_lower for word in ["hi", "hello", "hey"]) and len(question_lower) < 20:
                 return "Hello! I'm here to help with medical information about this patient. What would you like to know?"
             
             # Allergy queries
@@ -97,6 +99,14 @@ class MockBedrockClient:
             # Medication queries
             if "medication" in question_lower or "drug" in question_lower or "prescription" in question_lower:
                 return "Current medications: Metoprolol 50mg daily for blood pressure, Lisinopril 10mg daily for hypertension. No adverse reactions reported."
+            
+            # Contact info queries - INCLUDES PHI FOR TESTING REDACTION
+            if "contact" in question_lower or "phone" in question_lower or "email" in question_lower or "address" in question_lower:
+                return "Patient contact information: Phone 555-123-4567, Email john.anderson@email.com, Address 123 Oak Street, San Francisco, CA 94102-1234. Emergency contact: Jane Anderson at 555-987-6543."
+            
+            # Insurance/billing queries - INCLUDES PHI FOR TESTING REDACTION
+            if "insurance" in question_lower or "billing" in question_lower or "payment" in question_lower:
+                return "Insurance: Blue Cross Blue Shield, Policy #123-45-6789. Payment card on file: 4532-1234-5678-9012. Billing address: 456 Pine Avenue, Oakland CA 94601."
             
             # Treatment queries
             if "treatment" in question_lower or "therapy" in question_lower:
@@ -115,4 +125,4 @@ class MockBedrockClient:
                 return "Recent labs show normal CBC, lipid panel within target ranges. Creatinine 1.0 mg/dL, eGFR >60. No concerning findings."
             
             # Default response for other queries
-            return f"I can help answer questions about this patient's medical information. Regarding '{question}', I recommend reviewing the patient's complete medical record for detailed information."
+            return f"I can help answer questions about this patient's medical information. Based on the available records, I recommend reviewing the patient's complete chart for detailed information about your specific question."

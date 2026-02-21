@@ -124,6 +124,82 @@ SET p999.name = "Alexandra Sterling",
     p999.vip = true,
     p999.privacy_flag = "MAXIMUM";
 
+// Celebrity Patients (VIP)
+MERGE (p201:Patient {id: "P201"})
+SET p201.name = "Taylor Swift",
+    p201.dob = "1989-12-13",
+    p201.ssn = "201-11-2222",
+    p201.gender = "Female",
+    p201.blood_type = "O+",
+    p201.phone = "555-2001",
+    p201.email = "vip@taylorswift.com",
+    p201.address = "1 Music Row, Nashville, TN 37203",
+    p201.emergency_contact = "Management Team - 555-2002",
+    p201.insurance_provider = "Platinum Care",
+    p201.insurance_id = "PC-201201201",
+    p201.vip = true,
+    p201.privacy_flag = "MAXIMUM";
+
+MERGE (p202:Patient {id: "P202"})
+SET p202.name = "Elon Musk",
+    p202.dob = "1971-06-28",
+    p202.ssn = "202-22-3333",
+    p202.gender = "Male",
+    p202.blood_type = "A+",
+    p202.phone = "555-2003",
+    p202.email = "ceo@spacex.com",
+    p202.address = "1 Rocket Road, Hawthorne, CA 90250",
+    p202.emergency_contact = "Executive Assistant - 555-2004",
+    p202.insurance_provider = "Elite Health",
+    p202.insurance_id = "EH-202202202",
+    p202.vip = true,
+    p202.privacy_flag = "MAXIMUM";
+
+MERGE (p203:Patient {id: "P203"})
+SET p203.name = "Beyoncé Knowles",
+    p203.dob = "1981-09-04",
+    p203.ssn = "203-33-4444",
+    p203.gender = "Female",
+    p203.blood_type = "B+",
+    p203.phone = "555-2005",
+    p203.email = "queen@beyonce.com",
+    p203.address = "1 Renaissance Drive, Los Angeles, CA 90028",
+    p203.emergency_contact = "Jay-Z - 555-2006",
+    p203.insurance_provider = "Platinum Care",
+    p203.insurance_id = "PC-203203203",
+    p203.vip = true,
+    p203.privacy_flag = "MAXIMUM";
+
+MERGE (p204:Patient {id: "P204"})
+SET p204.name = "LeBron James",
+    p204.dob = "1984-12-30",
+    p204.ssn = "204-44-5555",
+    p204.gender = "Male",
+    p204.blood_type = "O-",
+    p204.phone = "555-2007",
+    p204.email = "king@lebronjames.com",
+    p204.address = "1 Championship Court, Los Angeles, CA 90015",
+    p204.emergency_contact = "Savannah James - 555-2008",
+    p204.insurance_provider = "Sports Elite Health",
+    p204.insurance_id = "SEH-204204204",
+    p204.vip = true,
+    p204.privacy_flag = "MAXIMUM";
+
+MERGE (p205:Patient {id: "P205"})
+SET p205.name = "Oprah Winfrey",
+    p205.dob = "1954-01-29",
+    p205.ssn = "205-55-6666",
+    p205.gender = "Female",
+    p205.blood_type = "AB+",
+    p205.phone = "555-2009",
+    p205.email = "contact@oprah.com",
+    p205.address = "1 Media Mogul Way, Montecito, CA 93108",
+    p205.emergency_contact = "Stedman Graham - 555-2010",
+    p205.insurance_provider = "Platinum Care",
+    p205.insurance_id = "PC-205205205",
+    p205.vip = true,
+    p205.privacy_flag = "MAXIMUM";
+
 // ============================================================
 // ALLERGIES
 // ============================================================
@@ -162,6 +238,28 @@ SET a5.patient_id = "P999",
     a5.severity = "MODERATE",
     a5.reaction = "Severe rash",
     a5.onset_date = "2010-07-05";
+
+// Celebrity Allergies
+MERGE (a6:Allergy {id: "A201-1"})
+SET a6.patient_id = "P201",
+    a6.allergen = "Shellfish",
+    a6.severity = "SEVERE",
+    a6.reaction = "Anaphylaxis",
+    a6.onset_date = "2015-03-10";
+
+MERGE (a7:Allergy {id: "A203-1"})
+SET a7.patient_id = "P203",
+    a7.allergen = "Penicillin",
+    a7.severity = "MODERATE",
+    a7.reaction = "Rash and swelling",
+    a7.onset_date = "2012-05-15";
+
+MERGE (a8:Allergy {id: "A205-1"})
+SET a8.patient_id = "P205",
+    a8.allergen = "Latex",
+    a8.severity = "MILD",
+    a8.reaction = "Contact dermatitis",
+    a8.onset_date = "2008-11-20";
 
 // ============================================================
 // MEDICATIONS
@@ -390,6 +488,13 @@ MERGE (d5:Doctor {id: "D5"})
 MERGE (p103:Patient {id: "P103"})
 MERGE (d5)-[:TREATS]->(p103);
 
+// Celebrity patients assigned to doctors
+MERGE (d1)-[:TREATS]->(p201:Patient {id: "P201"});
+MERGE (d2)-[:TREATS]->(p202:Patient {id: "P202"});
+MERGE (d1)-[:TREATS]->(p203:Patient {id: "P203"});
+MERGE (d5)-[:TREATS]->(p204:Patient {id: "P204"});
+MERGE (d2)-[:TREATS]->(p205:Patient {id: "P205"});
+
 // Doctor-Role relationships
 MERGE (d4:Doctor {id: "D4"})
 MERGE (er_role:Role {name: "ER"})
@@ -413,6 +518,19 @@ MERGE (p104)-[:HAS_ALLERGY]->(a4);
 MERGE (p999:Patient {id: "P999"})
 MERGE (a5:Allergy {id: "A999-1"})
 MERGE (p999)-[:HAS_ALLERGY]->(a5);
+
+// Celebrity allergy relationships
+MERGE (p201:Patient {id: "P201"})
+MERGE (a6:Allergy {id: "A201-1"})
+MERGE (p201)-[:HAS_ALLERGY]->(a6);
+
+MERGE (p203:Patient {id: "P203"})
+MERGE (a7:Allergy {id: "A203-1"})
+MERGE (p203)-[:HAS_ALLERGY]->(a7);
+
+MERGE (p205:Patient {id: "P205"})
+MERGE (a8:Allergy {id: "A205-1"})
+MERGE (p205)-[:HAS_ALLERGY]->(a8);
 
 // Patient-Medication relationships
 MERGE (p101:Patient {id: "P101"})

@@ -183,6 +183,7 @@
             cursor: pointer;
             transition: all 0.3s;
             border: 2px solid transparent;
+            position: relative;
         }
 
         .patient-item:hover {
@@ -199,11 +200,56 @@
             font-weight: 600;
             color: #333;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .patient-id {
             font-size: 12px;
             color: #666;
+        }
+
+        .vip-badge {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .risk-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .risk-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .risk-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .risk-high {
+            background: #f8d7da;
+            color: #721c24;
+            animation: pulse-risk 2s infinite;
+        }
+
+        @keyframes pulse-risk {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         /* Chat Area */
@@ -281,6 +327,56 @@
             background: #fff5f5;
             border-left: 4px solid #ff4757;
             color: #c92a2a;
+        }
+
+        .message-redacted {
+            position: relative;
+        }
+
+        .redaction-badge {
+            display: inline-block;
+            background: #3742fa;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        .speak-btn {
+            display: inline-block;
+            background: #10ac84;
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            vertical-align: middle;
+        }
+
+        .speak-btn:hover {
+            background: #0e9770;
+            transform: scale(1.05);
+        }
+
+        .speak-btn:active {
+            transform: scale(0.95);
+        }
+
+        .speak-btn.speaking {
+            background: #ff6b6b;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
         }
 
         .message-time {
@@ -386,6 +482,70 @@
             color: #2ed573;
         }
 
+        .compliance-badge {
+            font-size: 36px;
+            font-weight: 900;
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .compliance-excellent {
+            background: linear-gradient(135deg, #2ed573, #26de81);
+            color: white;
+        }
+
+        .compliance-good {
+            background: linear-gradient(135deg, #ffa502, #ff6348);
+            color: white;
+        }
+
+        .compliance-poor {
+            background: linear-gradient(135deg, #ff4757, #c92a2a);
+            color: white;
+        }
+
+        .security-alerts {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 12px;
+            border-left: 4px solid #ccc;
+        }
+
+        .alert-critical {
+            border-left-color: #ff4757;
+            background: #fff5f5;
+        }
+
+        .alert-high {
+            border-left-color: #ffa502;
+            background: #fff8e1;
+        }
+
+        .alert-medium {
+            border-left-color: #3742fa;
+            background: #f0f3ff;
+        }
+
+        .alert-description {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .alert-time {
+            color: #666;
+            font-size: 10px;
+        }
+
         .activity-log {
             margin-top: 20px;
         }
@@ -417,6 +577,84 @@
             content: "";
             display: table;
             clear: both;
+        }
+
+        /* Attack Pattern Analytics */
+        .attack-analytics {
+            margin-top: 20px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .attack-analytics h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .attack-pattern-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .attack-pattern-item:last-child {
+            border-bottom: none;
+        }
+
+        .attack-pattern-label {
+            font-size: 13px;
+            color: #333;
+        }
+
+        .attack-pattern-bar {
+            flex: 1;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+
+        .attack-pattern-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .attack-pattern-fill.prompt-injection {
+            background: linear-gradient(90deg, #ff4757, #ff6348);
+        }
+
+        .attack-pattern-fill.phi-exfiltration {
+            background: linear-gradient(90deg, #ffa502, #ff6348);
+        }
+
+        .attack-pattern-fill.keyword-block {
+            background: linear-gradient(90deg, #3742fa, #5352ed);
+        }
+
+        .attack-pattern-count {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .most-common-attack {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff5f5;
+            border-left: 4px solid #ff4757;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .most-common-attack strong {
+            color: #ff4757;
         }
     </style>
 </head>
@@ -492,6 +730,12 @@
                     <h2>📊 Live Metrics</h2>
                 </div>
                 <div class="dashboard-content">
+                    <!-- HIPAA Compliance Score -->
+                    <div class="compliance-badge" id="complianceBadge">
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">HIPAA Compliance</div>
+                        <div id="complianceScore">100%</div>
+                    </div>
+
                     <div class="metric-card">
                         <div class="metric-label">Total Requests</div>
                         <div class="metric-value" id="metricRequests">0</div>
@@ -507,6 +751,45 @@
                     <div class="metric-card">
                         <div class="metric-label">Security Mode</div>
                         <div class="metric-value" id="metricMode">NORMAL</div>
+                    </div>
+
+                    <!-- Security Alerts -->
+                    <div class="security-alerts">
+                        <h3 style="margin-bottom: 15px; font-size: 16px;">🚨 Security Alerts</h3>
+                        <div id="securityAlerts">
+                            <div class="loading">No alerts</div>
+                        </div>
+                    </div>
+
+                    <!-- Attack Pattern Analytics -->
+                    <div class="attack-analytics">
+                        <h3>🎯 Attack Pattern Analytics</h3>
+                        <div id="attackPatterns">
+                            <div class="attack-pattern-item">
+                                <span class="attack-pattern-label">Prompt Injection</span>
+                                <div class="attack-pattern-bar">
+                                    <div class="attack-pattern-fill prompt-injection" id="promptInjectionBar" style="width: 0%"></div>
+                                </div>
+                                <span class="attack-pattern-count" id="promptInjectionCount">0</span>
+                            </div>
+                            <div class="attack-pattern-item">
+                                <span class="attack-pattern-label">PHI Exfiltration</span>
+                                <div class="attack-pattern-bar">
+                                    <div class="attack-pattern-fill phi-exfiltration" id="phiExfiltrationBar" style="width: 0%"></div>
+                                </div>
+                                <span class="attack-pattern-count" id="phiExfiltrationCount">0</span>
+                            </div>
+                            <div class="attack-pattern-item">
+                                <span class="attack-pattern-label">Keyword Blocks</span>
+                                <div class="attack-pattern-bar">
+                                    <div class="attack-pattern-fill keyword-block" id="keywordBlockBar" style="width: 0%"></div>
+                                </div>
+                                <span class="attack-pattern-count" id="keywordBlockCount">0</span>
+                            </div>
+                        </div>
+                        <div class="most-common-attack" id="mostCommonAttack">
+                            <strong>Most Common:</strong> <span id="mostCommonType">None detected</span>
+                        </div>
                     </div>
 
                     <div class="activity-log">
@@ -625,9 +908,27 @@
                 patients.forEach(patient => {
                     const item = document.createElement('div');
                     item.className = 'patient-item';
+                    
+                    // Build patient name with VIP badge
+                    let nameHTML = `<div class="patient-name">${patient.name}`;
+                    if (patient.vip) {
+                        nameHTML += ' <span class="vip-badge">⭐ VIP</span>';
+                    }
+                    nameHTML += '</div>';
+                    
+                    // Add risk badge
+                    let riskBadge = '';
+                    if (patient.risk_level) {
+                        const riskClass = `risk-${patient.risk_level.toLowerCase()}`;
+                        const riskEmoji = patient.risk_level === 'HIGH' ? '🔴' : 
+                                         patient.risk_level === 'MEDIUM' ? '🟡' : '🟢';
+                        riskBadge = `<span class="risk-badge ${riskClass}">${riskEmoji} ${patient.risk_level}</span>`;
+                    }
+                    
                     item.innerHTML = `
-                        <div class="patient-name">${patient.name}</div>
+                        ${nameHTML}
                         <div class="patient-id">ID: ${patient.id}</div>
+                        ${riskBadge}
                     `;
                     item.onclick = () => selectPatient(patient);
                     listDiv.appendChild(item);
@@ -686,20 +987,58 @@
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message clearfix';
                 
+                // User message
                 const userMsg = document.createElement('div');
                 userMsg.className = 'message-user';
-                userMsg.innerHTML = `
-                    ${msg.message}
-                    <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div>
-                `;
+                userMsg.textContent = msg.message;
+                
+                const userTime = document.createElement('div');
+                userTime.className = 'message-time';
+                userTime.textContent = new Date(msg.timestamp).toLocaleTimeString();
+                userMsg.appendChild(userTime);
+                
                 messageDiv.appendChild(userMsg);
 
+                // Assistant message
                 const assistantMsg = document.createElement('div');
                 assistantMsg.className = msg.blocked ? 'message-assistant message-blocked' : 'message-assistant';
-                assistantMsg.innerHTML = `
-                    ${msg.blocked ? '🚫 ' : ''}${msg.response || msg.reason}
-                    <div class="message-time">${new Date(msg.timestamp).toLocaleTimeString()}</div>
-                `;
+                if (msg.redaction_count && msg.redaction_count > 0) {
+                    assistantMsg.classList.add('message-redacted');
+                }
+                
+                // Build response text
+                let responseText = msg.blocked ? '🚫 ' : '';
+                responseText += msg.response || msg.reason;
+                
+                // Create text node
+                const textNode = document.createTextNode(responseText);
+                assistantMsg.appendChild(textNode);
+                
+                // Add redaction badge if PHI was redacted
+                if (msg.redaction_count && msg.redaction_count > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'redaction-badge';
+                    badge.textContent = `🔒 ${msg.redaction_count} PHI redacted`;
+                    assistantMsg.appendChild(document.createTextNode(' '));
+                    assistantMsg.appendChild(badge);
+                }
+                
+                // Add speak button for non-blocked messages
+                if (!msg.blocked && msg.response) {
+                    const speakBtn = document.createElement('button');
+                    speakBtn.className = 'speak-btn';
+                    speakBtn.textContent = '🔊 Speak';
+                    speakBtn.onclick = function(e) { speakResponse(e.target, msg.response); };
+                    assistantMsg.appendChild(document.createTextNode(' '));
+                    assistantMsg.appendChild(speakBtn);
+                }
+                
+                // Add timestamp
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = new Date(msg.timestamp).toLocaleTimeString();
+                assistantMsg.appendChild(timeDiv);
+                
                 messageDiv.appendChild(assistantMsg);
 
                 container.appendChild(messageDiv);
@@ -716,6 +1055,89 @@
                 sendMessage();
             }
         });
+
+        // Speak response using MiniMax TTS
+        let currentAudio = null;
+        
+        async function speakResponse(button, text) {
+            try {
+                // Stop any currently playing audio
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio = null;
+                    // Remove speaking class from all buttons
+                    document.querySelectorAll('.speak-btn').forEach(btn => {
+                        btn.classList.remove('speaking');
+                        btn.textContent = '🔊 Speak';
+                    });
+                }
+                
+                button.disabled = true;
+                button.textContent = '⏳ Loading...';
+                
+                // Call TTS API
+                const response = await fetch(`${BACKEND_URL}/tts/speak`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        voice_id: 'English_Trustworth_Man'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('TTS request failed');
+                }
+                
+                const data = await response.json();
+                
+                if (data.success && data.audio_base64) {
+                    // Convert base64 to audio and play
+                    const audioBlob = base64ToBlob(data.audio_base64, 'audio/mp3');
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    currentAudio = new Audio(audioUrl);
+                    button.classList.add('speaking');
+                    button.textContent = '🔊 Playing...';
+                    button.disabled = false;
+                    
+                    currentAudio.onended = () => {
+                        button.classList.remove('speaking');
+                        button.textContent = '🔊 Speak';
+                        URL.revokeObjectURL(audioUrl);
+                        currentAudio = null;
+                    };
+                    
+                    currentAudio.onerror = () => {
+                        button.classList.remove('speaking');
+                        button.textContent = '🔊 Speak';
+                        button.disabled = false;
+                        alert('Error playing audio');
+                        currentAudio = null;
+                    };
+                    
+                    await currentAudio.play();
+                } else {
+                    throw new Error(data.error || 'TTS failed');
+                }
+            } catch (error) {
+                console.error('TTS error:', error);
+                button.textContent = '🔊 Speak';
+                button.disabled = false;
+                alert('Failed to generate speech. Please try again.');
+            }
+        }
+        
+        // Helper function to convert base64 to Blob
+        function base64ToBlob(base64, mimeType) {
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], { type: mimeType });
+        }
 
         async function sendMessage() {
             const input = document.getElementById('chatInput');
@@ -752,7 +1174,8 @@
                     response: result.final_text,
                     blocked: result.blocked,
                     reason: result.reason,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    redaction_count: result.redaction_count || 0
                 });
 
                 // Re-render messages
@@ -831,7 +1254,11 @@
         // Metrics polling
         function startMetricsPolling() {
             updateMetrics();
+            updateSecurityAlerts();
+            updateAttackPatterns();
             setInterval(updateMetrics, 5000);
+            setInterval(updateSecurityAlerts, 10000);
+            setInterval(updateAttackPatterns, 10000);
         }
 
         async function updateMetrics() {
@@ -848,8 +1275,102 @@
                 document.getElementById('metricSuccess').textContent = successRate + '%';
                 
                 document.getElementById('metricMode').textContent = metrics.security_mode || 'NORMAL';
+                
+                // Update HIPAA Compliance Score
+                const complianceScore = metrics.hipaa_compliance_score || 100;
+                document.getElementById('complianceScore').textContent = complianceScore.toFixed(1) + '%';
+                
+                const badge = document.getElementById('complianceBadge');
+                badge.className = 'compliance-badge';
+                if (complianceScore >= 95) {
+                    badge.classList.add('compliance-excellent');
+                } else if (complianceScore >= 90) {
+                    badge.classList.add('compliance-good');
+                } else {
+                    badge.classList.add('compliance-poor');
+                }
             } catch (error) {
                 console.error('Error updating metrics:', error);
+            }
+        }
+
+        async function updateSecurityAlerts() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/security/alerts`);
+                const alerts = await response.json();
+                
+                const container = document.getElementById('securityAlerts');
+                container.innerHTML = '';
+                
+                if (alerts.length === 0) {
+                    container.innerHTML = '<div class="loading">No alerts</div>';
+                    return;
+                }
+                
+                alerts.slice(0, 10).forEach(alert => {
+                    const item = document.createElement('div');
+                    item.className = `alert-item alert-${alert.severity.toLowerCase()}`;
+                    
+                    const timestamp = new Date(alert.timestamp).toLocaleString();
+                    
+                    item.innerHTML = `
+                        <div class="alert-description">${alert.description}</div>
+                        <div class="alert-time">${timestamp}</div>
+                    `;
+                    container.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error updating security alerts:', error);
+            }
+        }
+
+        async function updateAttackPatterns() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/security/attack-patterns`);
+                const patterns = await response.json();
+                
+                // Update counts and bars
+                const total = patterns.prompt_injection + patterns.phi_exfiltration + patterns.keyword_blocks;
+                
+                if (total === 0) {
+                    document.getElementById('promptInjectionBar').style.width = '0%';
+                    document.getElementById('phiExfiltrationBar').style.width = '0%';
+                    document.getElementById('keywordBlockBar').style.width = '0%';
+                    document.getElementById('promptInjectionCount').textContent = '0';
+                    document.getElementById('phiExfiltrationCount').textContent = '0';
+                    document.getElementById('keywordBlockCount').textContent = '0';
+                    document.getElementById('mostCommonType').textContent = 'None detected';
+                    return;
+                }
+                
+                const promptPct = (patterns.prompt_injection / total * 100).toFixed(0);
+                const phiPct = (patterns.phi_exfiltration / total * 100).toFixed(0);
+                const keywordPct = (patterns.keyword_blocks / total * 100).toFixed(0);
+                
+                document.getElementById('promptInjectionBar').style.width = promptPct + '%';
+                document.getElementById('phiExfiltrationBar').style.width = phiPct + '%';
+                document.getElementById('keywordBlockBar').style.width = keywordPct + '%';
+                
+                document.getElementById('promptInjectionCount').textContent = patterns.prompt_injection;
+                document.getElementById('phiExfiltrationCount').textContent = patterns.phi_exfiltration;
+                document.getElementById('keywordBlockCount').textContent = patterns.keyword_blocks;
+                
+                // Determine most common
+                const attacks = [
+                    { name: 'Prompt Injection', count: patterns.prompt_injection },
+                    { name: 'PHI Exfiltration', count: patterns.phi_exfiltration },
+                    { name: 'Keyword Blocks', count: patterns.keyword_blocks }
+                ];
+                attacks.sort((a, b) => b.count - a.count);
+                
+                if (attacks[0].count > 0) {
+                    document.getElementById('mostCommonType').textContent = 
+                        `${attacks[0].name} (${attacks[0].count} attacks)`;
+                } else {
+                    document.getElementById('mostCommonType').textContent = 'None detected';
+                }
+            } catch (error) {
+                console.error('Error updating attack patterns:', error);
             }
         }
     </script>

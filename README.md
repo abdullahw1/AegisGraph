@@ -2,49 +2,72 @@
 
 **HIPAA-Aligned LLM Firewall with Graph-Based Authorization**
 
-AegisGraph is a security-first LLM gateway that enforces HIPAA compliance through a four-agent pipeline with Neo4j-powered authorization, real-time threat detection, and comprehensive Datadog monitoring.
+AegisGraph is a production-ready security-first LLM gateway that enforces HIPAA compliance through a four-agent pipeline with Neo4j-powered authorization, real-time threat detection, automatic PHI redaction, self-healing security escalation, and comprehensive Datadog observability.
 
-## Features
+## 🎯 Key Features
 
-### 🔒 Security Pipeline
-- **Intent Classification**: Analyzes request intent (TREATMENT, DIAGNOSIS, ADMIN, etc.)
-- **Graph-Based Authorization**: Neo4j relationship validation for doctor-patient access
-- **Safety Scanning**: Real-time threat detection (prompt injection, jailbreak attempts, PII leakage)
-- **Response Generation**: Context-aware clinical responses with conversation history
+### 🔒 Four-Agent Security Pipeline
+- **Intent Agent**: Classifies request intent (TREATMENT, DIAGNOSIS, ADMIN, EMERGENCY)
+- **Graph Policy Agent**: Neo4j relationship validation for doctor-patient access control
+- **Safety Agent**: Real-time threat detection (prompt injection, jailbreak, PII exfiltration)
+- **Response Agent**: Context-aware clinical responses with automatic PHI redaction
 
-### 🏥 Healthcare-Specific
-- **HIPAA Compliance**: Audit trails, access controls, and PHI protection
-- **Break-Glass Access**: Emergency mode for critical situations with full audit logging
-- **Doctor Authentication**: Passcode-based login with patient assignment
-- **Conversation Context**: Maintains chat history per doctor-patient session
+### 🏥 Healthcare-Specific Features
+- **HIPAA Compliance**: Complete audit trails, access controls, and PHI protection
+- **Automatic PHI Redaction**: Real-time detection and redaction of sensitive information (SSN, credit cards, emails, phone numbers, addresses)
+- **Break-Glass Emergency Access**: One-click emergency mode with full audit logging
+- **VIP Patient Protection**: Enhanced monitoring for high-profile patients
+- **Risk Scoring**: Real-time patient risk assessment based on access patterns
 
-### 📊 Live Monitoring
-- **Datadog Integration**: Real-time logs, metrics, and dashboards
-- **Prompt Visibility**: All LLM prompts and responses logged
-- **Cost Tracking**: Token usage and LLM costs monitored
-- **Security Metrics**: Authorization rates, blocked requests, PHI risk scores
+### 🛡️ Advanced Security
+- **Self-Healing Security**: Automatic escalation to STRICT_MODE after threshold breaches
+- **Attack Pattern Analytics**: Real-time categorization of threats (prompt injection, PHI exfiltration, keyword blocks)
+- **Security Mode Management**: NORMAL → STRICT_MODE → LOCKDOWN with automatic reversion
+- **Datadog MCP Integration**: Intelligent threat detection with configurable thresholds
 
-### 🎨 Modern UI
-- **Three-Panel Layout**: Patient list, chat interface, live metrics
-- **Emergency Mode**: One-click access to all patients with audit trail
-- **Activity Logging**: All actions tracked in Neo4j for compliance
-- **Real-Time Updates**: Live security mode and metrics display
+### 📊 Comprehensive Observability
+- **Datadog APM**: Full distributed tracing with ddtrace integration
+- **LLM Observability**: All prompts, responses, and costs tracked
+- **Custom Dashboards**: Pre-built dashboard with 10+ widgets
+- **Real-Time Metrics**: Live security alerts, attack patterns, and compliance scores
+- **Cost Tracking**: Token usage and LLM costs monitored per request
+
+### 🎨 Modern Web Interface
+- **Three-Panel Layout**: Patient list with risk badges, chat interface, live metrics dashboard
+- **Emergency Mode UI**: Visual indicators and one-click emergency access
+- **Live Security Alerts**: Real-time security event stream
+- **Attack Pattern Visualization**: Bar charts showing threat distribution
+- **HIPAA Compliance Score**: Live compliance percentage display
+- **Text-to-Speech**: MiniMax TTS integration for voice alerts and response playback
+
+### 🔊 Voice Features (NEW)
+- **MiniMax TTS Integration**: Convert responses to speech with high-quality voices
+- **Speak Response Button**: Click to hear any assistant response
+- **Security Voice Alerts**: Automatic voice notifications for critical security events
+- **Daily Security Summaries**: Automated voice reports of security metrics
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                         UI Layer                             │
-│  (Doctor Login → Patient Selection → Chat Interface)        │
+│  (Doctor Login → Patient Selection → Chat + Voice)          │
+│  • Risk Badges • Live Metrics • Attack Analytics            │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                    Security Pipeline                         │
 │                                                              │
-│  1. Intent Agent      → Classify request intent             │
-│  2. Graph Policy      → Neo4j authorization check           │
-│  3. Safety Agent      → Threat detection & scanning         │
-│  4. Response Agent    → Context-aware LLM generation        │
+│  1. LOCKDOWN Gate     → Immediate refusal if locked         │
+│  2. Intent Agent      → Classify request intent             │
+│  3. Graph Policy      → Neo4j authorization + emergency      │
+│  4. Deny Gate         → Block unauthorized access           │
+│  5. Safety Agent      → Threat detection & scanning         │
+│  6. Block Gate        → Stop malicious requests + TTS alert │
+│  7. Response Agent    → LLM generation + PHI redaction      │
+│  8. Datadog Metrics   → Log everything                      │
+│  9. Self-Heal Check   → Auto-escalate if threshold hit      │
+│  10. Save History     → Neo4j audit trail                   │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
                               ↓
@@ -52,8 +75,10 @@ AegisGraph is a security-first LLM gateway that enforces HIPAA compliance throug
 │                    Data & Monitoring                         │
 │                                                              │
 │  • Neo4j: Relationships, chat history, audit logs           │
-│  • Datadog: Real-time logs, metrics, dashboards             │
-│  • AWS Bedrock / Mock: LLM inference                        │
+│  • Datadog: APM traces, logs, metrics, dashboards           │
+│  • AWS Bedrock: Claude 3.5 Sonnet for LLM inference         │
+│  • MiniMax: Text-to-speech for voice alerts                 │
+│  • PHI Redactor: Real-time sensitive data detection         │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -133,15 +158,20 @@ DD_API_KEY=your-datadog-api-key
 DD_APP_KEY=your-datadog-app-key
 DD_AGENT_HOST=localhost
 DD_STATSD_PORT=8125
+DD_DASHBOARD_URL=https://app.datadoghq.com/dashboard/your-dashboard-id
 
-# AWS Bedrock (Optional)
+# AWS Bedrock Configuration
 AWS_REGION=us-west-2
+AWS_DEFAULT_REGION=us-west-2
 AWS_ACCESS_KEY_ID=your-access-key
 AWS_SECRET_ACCESS_KEY=your-secret-key
-AWS_SESSION_TOKEN=your-session-token
+AWS_SESSION_TOKEN=your-session-token  # Optional for temporary credentials
 
-# Mock Mode (set to true if no AWS Bedrock access)
-USE_MOCK_BEDROCK=true
+# MiniMax TTS (Optional - for voice features)
+MINIMAX_API_KEY=your-minimax-api-key
+
+# Mock Mode (set to false to use real AWS Bedrock)
+USE_MOCK_BEDROCK=false
 ```
 
 ### Security Modes
@@ -165,28 +195,44 @@ curl -X POST http://localhost:8000/mode \
 ```bash
 POST /chat
 {
-  "user_id": "U1",
-  "role": "doctor",
+  "user_id": "D1",
+  "role": "Cardiologist",
   "doc_id": "D1",
   "patient_id": "P101",
   "message": "What is the patient's blood type?",
-  "security_mode": "NORMAL"
+  "emergency_mode": false
 }
+```
+
+### Text-to-Speech (NEW)
+```bash
+POST /tts/speak
+{
+  "text": "Security alert: Unauthorized access detected",
+  "voice_id": "English_Trustworth_Man"
+}
+```
+
+### Security & Monitoring
+```bash
+GET /metrics                          # Current system metrics
+GET /mode                             # Current security mode
+POST /mode                            # Change security mode
+GET /security/alerts                  # Recent security alerts (last 20)
+GET /security/attack-patterns         # Attack pattern analytics
+POST /security/daily-summary          # Generate daily security summary with TTS
 ```
 
 ### Doctors & Patients
 ```bash
 GET /doctors                          # List all doctors
-GET /patients?doctor_id=D1            # List patients for doctor
+GET /patients?doctor_id=D1            # List patients for doctor (with risk scores)
 GET /chat/history?patient_id=P101&doctor_id=D1  # Get chat history
 ```
 
-### Monitoring
+### Datadog Integration
 ```bash
-GET /metrics                          # Current system metrics
-GET /mode                             # Current security mode
-POST /mode                            # Change security mode
-POST /datadog/create-dashboard        # Create Datadog dashboard
+POST /datadog/create-dashboard        # Create Datadog dashboard programmatically
 ```
 
 ### Activity Logging
@@ -194,8 +240,9 @@ POST /datadog/create-dashboard        # Create Datadog dashboard
 POST /activity/log
 {
   "doctor_id": "D1",
-  "type": "emergency_access",
-  "description": "Accessed all patients in emergency mode"
+  "type": "EMERGENCY_ACCESS",
+  "description": "Accessed all patients in emergency mode",
+  "timestamp": "2024-02-20T12:00:00Z"
 }
 ```
 
@@ -230,26 +277,38 @@ Logs appear in Datadog after 2-5 minutes of indexing:
 
 ## Testing
 
-### Run Tests
+### Run All Tests
 ```bash
-# All tests
-pytest
+# Run all tests
+pytest tests/
 
-# Specific test file
-pytest backend/test_orchestrator.py
+# Run with coverage
+pytest tests/ --cov=backend --cov-report=html
 
-# With coverage
-pytest --cov=backend --cov-report=html
+# Run specific test file
+pytest tests/test_orchestrator.py
+
+# Run with verbose output
+pytest tests/ -v
 ```
 
-### Integration Test
+### Individual Test Files
 ```bash
-python backend/test_integration.py
-```
+# Integration tests
+pytest tests/test_integration.py
 
-### Connectivity Test
-```bash
-python test_connectivity.py
+# Agent tests
+pytest tests/test_intent_agent.py
+pytest tests/test_graph_policy_agent.py
+pytest tests/test_safety_agent.py
+pytest tests/test_response_agent.py
+
+# Feature tests
+pytest tests/test_phi_redactor.py
+pytest tests/test_tts.py
+
+# Connectivity tests
+python tests/test_connectivity.py
 ```
 
 ## Project Structure
@@ -257,28 +316,48 @@ python test_connectivity.py
 ```
 AegisGraph/
 ├── backend/
-│   ├── agents/              # Four-agent pipeline
+│   ├── agents/              # Four-agent security pipeline
 │   │   ├── intent_agent.py
 │   │   ├── graph_policy_agent.py
 │   │   ├── safety_agent.py
 │   │   └── response_agent.py
 │   ├── models/              # Pydantic schemas
+│   │   └── schemas.py
 │   ├── tools/               # External integrations
 │   │   ├── neo4j_client.py
 │   │   ├── bedrock_client.py
 │   │   ├── mock_bedrock_client.py
-│   │   └── datadog_mcp_tool.py
-│   ├── telemetry/           # Monitoring
+│   │   ├── minimax_client.py      # TTS integration
+│   │   ├── phi_redactor.py        # PHI detection & redaction
+│   │   └── datadog_mcp_tool.py    # Self-healing security
+│   ├── telemetry/           # Observability
 │   │   ├── datadog_integration.py
 │   │   ├── ddtrace_setup.py
 │   │   └── metrics.py
 │   ├── seed_data/           # Database seeding
+│   │   ├── seed.py
+│   │   └── seed.cypher
 │   ├── orchestrator.py      # Pipeline coordinator
-│   └── main.py              # FastAPI app
+│   └── main.py              # FastAPI application
 ├── ui/
-│   └── app.html             # Modern web interface
+│   ├── app.html             # Modern web interface
+│   └── index.html           # Landing page
+├── tests/                   # All test files
+│   ├── test_orchestrator.py
+│   ├── test_integration.py
+│   ├── test_main.py
+│   ├── test_intent_agent.py
+│   ├── test_graph_policy_agent.py
+│   ├── test_safety_agent.py
+│   ├── test_response_agent.py
+│   ├── test_phi_redactor.py
+│   ├── test_tts.py
+│   └── test_connectivity.py
 ├── .env.example             # Environment template
+├── .env                     # Your configuration (gitignored)
 ├── requirements.txt         # Python dependencies
+├── start_backend.sh         # Backend startup script
+├── start_ui.sh              # UI startup script
 └── README.md                # This file
 ```
 
@@ -292,6 +371,42 @@ AegisGraph/
 - **[NEW_UI_FEATURES.md](NEW_UI_FEATURES.md)**: UI feature documentation
 
 ## Features in Detail
+
+### PHI Redaction (NEW)
+Automatically detects and redacts sensitive information:
+- **SSN**: 123-45-6789 → [REDACTED_SSN]
+- **Credit Cards**: 4532-1234-5678-9012 → [REDACTED_CREDIT_CARD]
+- **Emails**: john@example.com → [REDACTED_EMAIL]
+- **Phone Numbers**: 555-123-4567 → [REDACTED_PHONE]
+- **Addresses**: 123 Main St, City, ST 12345 → [REDACTED_ADDRESS]
+
+Redaction count tracked per response and displayed in UI with badge.
+
+### Attack Pattern Analytics (NEW)
+Real-time categorization of security threats:
+- **Prompt Injection**: Attempts to manipulate system behavior
+- **PHI Exfiltration**: Unauthorized data access attempts
+- **Keyword Blocks**: Sensitive term detection
+
+Dashboard shows:
+- Bar charts with threat distribution
+- Most common attack type
+- Total blocked requests by category
+
+### Self-Healing Security (NEW)
+Automatic security escalation based on threat patterns:
+- **Monitoring Window**: 60 seconds
+- **Threshold**: 3 auth denials or safety blocks
+- **Action**: Auto-escalate to STRICT_MODE
+- **Cooldown**: 10 minutes before auto-revert to NORMAL
+- **Manual Override**: Admin can change mode anytime
+
+### Voice Features (NEW)
+MiniMax TTS integration for audio feedback:
+- **Speak Response**: Click 🔊 button to hear any response
+- **Security Alerts**: Automatic voice notifications for critical events
+- **Daily Summaries**: Automated voice reports of security metrics
+- **Voice Selection**: Multiple voice options (English_Trustworth_Man, etc.)
 
 ### Intent Classification
 Automatically categorizes requests:
@@ -308,6 +423,11 @@ MATCH (d:Doctor {id: $docId})-[:TREATS]->(p:Patient {id: $patId})
 RETURN authorized
 ```
 
+Emergency mode override:
+- Bypasses relationship checks
+- Full audit trail maintained
+- Break-glass access logged
+
 ### Safety Scanning
 Detects security threats:
 - Prompt injection attempts
@@ -316,12 +436,18 @@ Detects security threats:
 - Unauthorized data access
 - Malicious intent
 
+Risk scoring (0-100):
+- 0-30: Low risk (allow)
+- 31-70: Medium risk (allow with monitoring)
+- 71-100: High risk (block)
+
 ### Conversation Context
 Maintains chat history:
 - Last 10 messages per doctor-patient session
 - Chronological ordering
 - Context-aware responses
 - Session management
+- Redaction count tracking
 
 ## Security Features
 
@@ -349,22 +475,49 @@ Automatic security escalation:
 
 ## Monitoring & Observability
 
+### Datadog Dashboard Widgets
+1. **Total Requests**: Live count with trend
+2. **Blocked Requests**: Security blocks over time
+3. **HIPAA Compliance Score**: Real-time percentage
+4. **Security Mode**: Current mode indicator
+5. **Token Usage**: Input/output tokens tracked
+6. **Cost Tracking**: Cumulative LLM costs
+7. **Log Stream**: Real-time prompts and responses
+8. **Attack Patterns**: Threat distribution chart
+9. **Top 5 Attacked Patients**: Most targeted patients
+10. **PHI Redactions**: Redaction count metrics
+
 ### Metrics Tracked
 - Total requests
 - Blocked requests
 - Authorization success rate
 - Token usage (input/output)
-- LLM costs
+- LLM costs per request
 - Response times
 - PHI exposure risk
 - Security mode changes
+- Redaction counts
+- Attack pattern distribution
+- Patient risk scores
 
 ### Logs Captured
 - All LLM prompts and responses
 - Authorization decisions
 - Safety scan results
-- Error traces
+- PHI redaction events
+- Security mode changes
+- Emergency access events
+- Error traces with stack traces
 - Activity logs
+- Attack pattern classifications
+
+### APM Tracing
+Full distributed tracing with ddtrace:
+- `llm.generate` - Response generation span
+- `minimax.text_to_speech` - TTS conversion span
+- `minimax.tts_alert` - Voice alert span
+- Custom tags for request_id, security_mode, doc_id, patient_id
+- Error tracking and performance monitoring
 
 ## Development
 
